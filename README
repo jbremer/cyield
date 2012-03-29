@@ -1,0 +1,24 @@
+cyield    (C) Jurriaan Bremer 2012
+
+    Introduction
+
+cyield is a simple implementation of the python `yield' keyword in C using the
+win32 api, it uses Threads which give some overhead, but due to the simplicity
+of programming with so-called Generators this might be worth considering.
+For more information on the `yield' keyword, see the official python docs.
+
+    Explanation of the implementation
+
+So, assuming the readers knows the yield keyword by now, we have to store the
+state whenever a value is `returned', I could not think of a simpler method then
+using another thread, because the Operating System keeps track of the stack and
+registers, so all you have to do is make sure the thread executes on the right
+data on the right time.
+
+This implementation is based on an existing implementation in Objective-C using
+so-called Blocks, this article can be found here:
+http://www.mikeash.com/pyblog/friday-qa-2009-10-30-generators-in-objective-c.html
+
+    Examples
+
+For two simple, but possibly realistic, examples, see main.cpp
