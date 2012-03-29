@@ -3,7 +3,7 @@
 
 /*
  * Range(max): Simple Example using the yield keyword in C
- * Function declaration is a bit odd though, but it could've been worse.
+ * Function declaration is a bit odd, though it could've been worse.
 */
 CYIELD_FUNC(Range)
     for (int i = 0; i < arg0->ul; i++)
@@ -11,7 +11,14 @@ CYIELD_FUNC(Range)
 CYIELD_FUNC_END(0);
 
 /*
- * EnumDirectory(path): Shows a slightly more realistic scenario using yield.
+ * EnumDirectory(path): Shows a slightly more realistic scenario.
+ * See this example as a comparison between:
+ * - returning an array containing every filename as string
+ * - returning every time a filename has been found
+ * For larger amounts of files in a directory, or slower filesystems (for
+ * example one over `sshfs'), it might take quite some time before the entire
+ * directory has been enumerated, whereas a better user experience could be
+ * gained if files show up (in a listing, etc.) as they are found.
 */
 CYIELD_FUNC(EnumDirectory)
     WIN32_FIND_DATA FindData;

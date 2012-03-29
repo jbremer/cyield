@@ -10,7 +10,7 @@ For more information on the `yield' keyword, see the official python docs.
     Explanation of the implementation
 
 So, assuming the readers knows the yield keyword by now, we have to store the
-state whenever a value is `returned', I could not think of a simpler method then
+state whenever a value is `returned', I could not think of a simpler method than
 using another thread, because the Operating System keeps track of the stack and
 registers, so all you have to do is make sure the thread executes on the right
 data on the right time.
