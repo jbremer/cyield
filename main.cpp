@@ -43,4 +43,10 @@ int main(int argc, char *argv[])
     CYIELD_FOREACH1(const char *, filename, EnumDirectory, dir)
         printf("file: %s\n", filename);
     CYIELD_FOREACH_NEXT();
+
+    CYIELD_FOREACH1(int, x, Range, 5)
+        CYIELD_FOREACH1(int, y, Range, 10)
+            printf("x: %d, y: %d\n", x, y);
+        CYIELD_FOREACH_NEXT();
+    CYIELD_FOREACH_NEXT();
 }
