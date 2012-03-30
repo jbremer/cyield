@@ -11,6 +11,7 @@ typedef union _cyield_param_t {
 
 typedef struct _cyield_t {
     HANDLE hEvent;
+    HANDLE hContinue;
     cyield_param_t param[4];
     cyield_param_t yield;
     int quit;
@@ -28,30 +29,25 @@ typedef struct _cyield_t {
     SetEvent(self->hEvent); \
     return ret; }
 
-#ifdef __GNUC__
-#define _CYIELD_ASM asm(".byte 0xeb \n .byte 0xfe");
-#else
-#define _CYIELD_ASM __asm _emit 0xeb __asm _emit 0xfe
-#endif
-
 #define CYIELD(ptr) { \
     /* set the argument */ \
     self->yield.ul = (unsigned long)(ptr); \
-    /* signal the callee */ \
-    SetEvent(self->hEvent); \
-    /* while(1) loop */ \
-    _CYIELD_ASM }
+    /* signal the callee and wait */ \
+    SignalObjectAndWait(self->hEvent, self->hContinue, INFINITE, FALSE); }
 
 #define CYIELD_FOREACH(type, name, callback, arg0, arg1, arg2, arg3) { \
     /* create event and initialize cyield_t object */ \
-    cyield_t _yield = {CreateEvent(NULL, FALSE, FALSE, NULL), { \
-    (unsigned long)(arg0), (unsigned long)(arg1), \
-    (unsigned long)(arg2), (unsigned long)(arg3)}}; \
+    cyield_t _yield = { \
+        CreateEvent(NULL, FALSE, FALSE, NULL), \
+        CreateEvent(NULL, FALSE, FALSE, NULL), { \
+        (unsigned long)(arg0), (unsigned long)(arg1), \
+        (unsigned long)(arg2), (unsigned long)(arg3), \
+    }}; \
     /* create a thread, where all magic will happen */ \
     HANDLE _hThread = CreateThread(NULL, 0, \
         (LPTHREAD_START_ROUTINE)(callback), &_yield, 0, NULL); \
     while (WaitForSingleObject(_yield.hEvent, INFINITE) == \
-        WAIT_OBJECT_0 && _yield.quit == 0) { \
+            WAIT_OBJECT_0 && _yield.quit == 0) { \
         type name = (type) _yield.yield.ptr;
 
 #define CYIELD_FOREACH1(type, name, callback, arg0) \
@@ -64,16 +60,12 @@ typedef struct _cyield_t {
     CYIELD_FOREACH(type, name, callback, arg0, arg1, arg2, 0)
 
 #define CYIELD_FOREACH_NEXT() \
-    /* increase Eip with 2, */ \
-    /* steps over the while(1) loop */ \
-    SuspendThread(_hThread); \
-    CONTEXT _ctx = {CONTEXT_FULL}; \
-    GetThreadContext(_hThread, &_ctx); \
-    _ctx.Eip += 2; \
-    SetThreadContext(_hThread, &_ctx); \
-    ResumeThread(_hThread); } \
+    /* signal the continue event */ \
+    SetEvent(_yield.hContinue); } \
     /* close the event handle */ \
     CloseHandle(_yield.hEvent); \
+    /* close the continue handle */ \
+    CloseHandle(_yield.hContinue); \
     /* close thread handle */ \
     CloseHandle(_hThread); }
 

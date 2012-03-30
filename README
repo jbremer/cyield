@@ -21,4 +21,10 @@ http://www.mikeash.com/pyblog/friday-qa-2009-10-30-generators-in-objective-c.htm
 
     Examples
 
-For two simple, but possibly realistic, examples, see main.cpp
+For three simple, but possibly realistic, examples, see main.cpp
+
+    Notes
+
+The fact that this implementation uses threads to emulate yield makes it quite
+resource-hungry in certain scenario's, such as the nested example in main.cpp
+(a new thread is created, including two event objects, every iteration.)
