@@ -3,9 +3,11 @@ cyield    (C) Jurriaan Bremer 2012
     Introduction
 
 cyield is a simple implementation of the python `yield' keyword in C using the
-win32 api, it uses Threads which give some overhead, but due to the simplicity
-of programming with so-called Generators this might be worth considering.
-For more information on the `yield' keyword, see the official python docs.
+win32 and linux pthread api (it is compatible with both x86 and x64
+architectures), it uses threads which give some overhead, but due to the
+simplicity of programming with so-called Generators this might be worth
+considering. For more information on the `yield' keyword, see the official
+python docs.
 
     Explanation of the implementation
 
